@@ -2,11 +2,6 @@ name = "nexapulse-compute-frontend"
 compatibility_date = "2026-11-14"
 pages_build_output_dir = "dist"
 
-# For Cloudflare Pages (recommended for this Vite React SPA):
+# Cloudflare Pages:
 # Build command: npm run build
 # Output directory: dist
-#
-# When using Workers + Assets instead of classic Pages, you can also use:
-# [assets]
-# directory = "./dist"
-# binding = "ASSETS"
