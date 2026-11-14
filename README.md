@@ -1,60 +1,54 @@
-# NexaPulse Compute UI
+# NexaPulse Compute UI v0.4.0
 
-React + TypeScript + Vite dashboard for the internal NexaPulse Compute model-testing workspace.
+Clean React + TypeScript + Vite frontend for the NexaPulse Compute internal model-testing environment.
 
-## Included in this update
+## Changes in v0.4.0
 
-- Light, responsive workspace dashboard with runtime health, activity, environment and recent-event sections.
-- Persistent tab navigation: switching sections does not unmount the other sections or discard their component state.
-- IndexedDB-backed project ZIP import, file explorer, source editing, unsaved draft persistence, and updated ZIP export.
-- Unsaved-change warning before leaving the page and Ctrl/Cmd+S to save the selected source file.
-- Compute connections page with Supabase owner sign-in, pending enrollment listing, and approve/reject actions against the Compute Worker.
-- Model registry, analytics, settings and documentation views.
-- No fake runtime or analytics numbers: unavailable metrics are shown as unavailable until a real API endpoint exists.
+- Removed the left sidebar; primary sections now use the top navigation bar.
+- Added Supabase Auth account creation alongside sign-in on the Compute access screen.
+- Added browser session persistence for the Supabase access token; sign out clears it.
+- Removed hard-coded model cards, runtime/provider examples, configured-model counts and project examples from the dashboard.
+- Model registry requests `GET /v1/models` and displays only records returned by the Worker, with loading/error/empty states.
+- Dashboard reports only the Worker health response; it does not infer database or runtime health from `/health`.
+- Existing ZIP import, local source editing, IndexedDB draft persistence and ZIP export remain available.
+- Cloud project synchronization and isolated execution are not represented as available.
 
-## Requirements
+## Environment variables
 
-- Node.js 20 or newer recommended.
-- A deployed NexaPulse Compute Worker exposing `/health`, `/v1/enrollments`, `/v1/enrollments/{id}/approve`, `/v1/enrollments/{id}/reject` and the enrollment heartbeat path.
-- A Supabase project with Auth enabled and the public anon key available for the browser client.
+Set these in Cloudflare Pages build environment variables (or `.env.local` locally):
 
-## Local development
+```dotenv
+VITE_COMPUTE_API_URL=https://nexapulse-compute.blacknick517.workers.dev
+VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
+```
+
+Only the Supabase publishable/anon key belongs in the frontend. Never expose the service-role key, Worker secrets, node private keys or owner control tokens in Vite variables.
+
+## Authentication notes
+
+- Create Account calls Supabase Auth `/auth/v1/signup`.
+- Sign In calls `/auth/v1/token?grant_type=password`.
+- If email confirmation is enabled, users must confirm their email before signing in.
+- Registration does not grant owner privileges. The Worker must enforce its owner UUID allowlist for enrollment management.
+- The access token is stored in browser localStorage for session continuity. Sign out clears the local token.
+
+## Build and deploy
 
 ```bash
 npm install
-cp .env.example .env.local
-# Edit .env.local with your Worker URL and Supabase public credentials
-npm run dev
-```
-
-## Build
-
-```bash
 npm run build
 ```
 
-Output is written to `dist/`.
+Cloudflare Pages: Vite preset, `npm run build`, output directory `dist`, root directory blank.
 
-## Notes and limitations
+The frontend and Cloudflare Worker remain separate projects.
 
-- The UI is an internal control surface. It is not a public marketplace or public model gateway.
-- Browser model inference stays disabled until a protected browser access layer and signed Worker-to-notebook inference channel are implemented and tested. Do not expose `NP_CONTROL_TOKEN` or other private Worker credentials to browser code.
-- Kaggle and Colab runtimes are temporary and provider-managed. This UI does not bypass provider idle limits or guarantee a session remains alive.
-- ZIP contents are stored locally in IndexedDB. Imported project code is not uploaded, installed, executed, or previewed in this build. An isolated preview runner is a separate integration.
-- Analytics panels intentionally show unavailable states until the Worker exposes real metrics. No fabricated usage, uptime, TFLOPS, or health percentages are displayed.
+## Backend boundaries
 
-## Deployment
-
-Build the app with `npm run build` and deploy the generated `dist/` directory to the existing Cloudflare Pages project. Keep the Cloudflare Worker backend separate from this frontend repository.
-
-## Push to GitHub
-
-Extract this ZIP into the root of your frontend repository, then run:
-
-```bash
-git add .
-git commit -m "Update NexaPulse Compute dashboard to v0.3.0"
-git push
-```
-
-This is the frontend only. Keep the Cloudflare Worker/backend project separate.
+- `/health` confirms Worker reachability only.
+- `/v1/models` must return a JSON array or `{ "models": [] }`; otherwise the UI reports the endpoint error instead of inventing model records.
+- Compute owner enrollment endpoints remain protected by Supabase authentication and the Worker owner allowlist.
+- Model inference remains disabled until a signed Worker-to-notebook inference channel is implemented and verified.
+- Notebook sessions remain temporary and subject to Kaggle/Colab provider limits.
+- Imported project code is stored locally in IndexedDB; it is not uploaded, executed or previewed. An isolated runner is a separate backend service.
