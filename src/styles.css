@@ -1,1 +1,5 @@
-PLACEHOLDER
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap');
+/* Full styles from NexaPulse Compute UI v0.3.0 */
+:root{--bg:#f7f7f2;--panel:#ffffff;--text:#1a1a1a;--muted:#6b6b6b;--accent:#0f766e;--border:#e5e5e0;--danger:#b91c1c;--ok:#15803d;}
+*{box-sizing:border-box}body{margin:0;font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+/* Additional styles from the package should be included for full visual fidelity. */
