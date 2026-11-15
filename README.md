@@ -1,6 +1,14 @@
-# NexaPulse Compute UI v0.4.0
+# NexaPulse Compute UI v0.4.1
 
 Clean React + TypeScript + Vite frontend for the NexaPulse Compute internal model-testing environment.
+
+## Changes in v0.4.1
+
+- Fixes Supabase client configuration to prefer `VITE_SUPABASE_PUBLISHABLE_KEY`, while retaining `VITE_SUPABASE_ANON_KEY` as a fallback.
+- Validates the Supabase project URL and public-key format before attempting authentication, and gives a more useful error when the API rejects the key.
+- Removes the dashboard information-card grid and extra informational callout cards.
+- Moves primary navigation to a fixed bottom bar while keeping the NexaPulse header at the top.
+- Constrains the notification panel to the viewport with scrolling and a close control.
 
 ## Changes in v0.4.0
 
@@ -20,7 +28,8 @@ Set these in Cloudflare Pages build environment variables (or `.env.local` local
 ```dotenv
 VITE_COMPUTE_API_URL=https://nexapulse-compute.blacknick517.workers.dev
 VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
+# Legacy fallback also supported: VITE_SUPABASE_ANON_KEY
 ```
 
 Only the Supabase publishable/anon key belongs in the frontend. Never expose the service-role key, Worker secrets, node private keys or owner control tokens in Vite variables.
